@@ -1,13 +1,11 @@
 import React from 'react';
+import Button from './Button'
 
 export default function App() {
 
   return (
     <>
-      <h1>I am App Component!!!!</h1>
-      <button onClick={() => {
-        electron.notificationApi.sendNotification('My custom notification!');
-      }}>Notify</button>
-    </>
+      <Button />
+     </>
   )
 }
