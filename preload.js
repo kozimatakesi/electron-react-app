@@ -6,10 +6,14 @@ contextBridge.exposeInMainWorld('electron', {
       ipcRenderer.send('notify', message);
     }
   },
-  batteryApi: {
 
+  on: (channel, callback) => {
+    ipcRenderer.on(channel, (event, arg) => callback(event, arg));
   },
-  filesApi: {
 
+  filesApi: {
+    openFile(){
+      ipcRenderer.send('fileDialog');
+    }
   }
 })

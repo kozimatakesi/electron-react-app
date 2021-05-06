@@ -1,9 +1,9 @@
-const { BrowserWindow, app, ipcMain, Notification } = require('electron');
+const { BrowserWindow, app, ipcMain, Notification, dialog } = require('electron');
 const path = require('path');
 
 const isDev = !app.isPackaged;
 
-function createWindow() {
+const createWindow = () => {
   const win = new BrowserWindow({
     width: 600,
     height: 400,
@@ -17,6 +17,17 @@ function createWindow() {
   });
 
   win.loadFile('index.html');
+
+  ipcMain.on('fileDialog', async() => {
+    const filename = await dialog.showOpenDialog({
+      properties: ['openDirectory'],
+      title: 'ファイルを選択しよう'
+    });
+    const filepath = filename.filePaths[0];
+    console.log(filepath);
+    win.webContents.send('filename',filepath);
+  });
+
 }
 
 if (isDev) {
@@ -25,9 +36,11 @@ if (isDev) {
   });
 }
 
+//ipcRenderer.sendによりチャンネルnotifyに送られてきた引数messageをお知らせ表示する
 ipcMain.on('notify', (_, message) => {
   new Notification({ title: 'Notification', body: message }).show();
 });
+
 
 app.whenReady().then(() => {
   createWindow();
