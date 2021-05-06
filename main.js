@@ -1,5 +1,6 @@
 const { BrowserWindow, app, ipcMain, Notification, dialog } = require('electron');
 const path = require('path');
+const fs = require('fs');
 
 const isDev = !app.isPackaged;
 
@@ -26,6 +27,10 @@ const createWindow = () => {
     const filepath = filename.filePaths[0];
     console.log(filepath);
     win.webContents.send('filename',filepath);
+    fs.readdir(filepath, (err, files) => {
+      console.log(files);
+      win.webContents.send('allFiles',files);
+    })
   });
 
 }
