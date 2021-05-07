@@ -29,10 +29,10 @@ const createWindow = () => {
     win.webContents.send('filename',filepath);
     fs.readdir(filepath, (err, files) => {
       console.log(files);
+      files.shift();
       win.webContents.send('allFiles',files);
     })
   });
-
 }
 
 if (isDev) {
