@@ -4,7 +4,10 @@ const fs = require('fs');
 
 const isDev = !app.isPackaged;
 
+
+
 const createWindow = () => {
+
   const win = new BrowserWindow({
     width: 600,
     height: 400,
@@ -17,21 +20,9 @@ const createWindow = () => {
     },
   });
 
-  win.loadFile('index.html');
 
-  ipcMain.on('fileDialog', async() => {
-    const filename = await dialog.showOpenDialog({
-      properties: ['openDirectory'],
-      title: 'ファイルを選択しよう'
-    });
-    const filepath = filename.filePaths[0];
-    console.log(filepath);
-    win.webContents.send('filename',filepath);
-    fs.readdir(filepath, (err, files) => {
-      console.log(files);
-      files.shift();
-      win.webContents.send('allFiles',files);
-    })
+  ipcMain.on('fileDialog', () => {
+    dispDialog(win)
   });
   //menu追記
 
@@ -60,22 +51,10 @@ const createWindow = () => {
       label: 'ファイル',
       submenu: [
         isMac ? { role: 'close' } : { role: 'quit' },
-        { label: 'open' ,
+        {
+          label: 'open' ,
           accelerator: 'Command+0',
-          click: async() => {
-            const filename = await dialog.showOpenDialog({
-              properties: ['openDirectory'],
-              title: 'ファイルを選択しよう'
-            });
-            const filepath = filename.filePaths[0];
-            console.log(filepath);
-            win.webContents.send('filename',filepath);
-            fs.readdir(filepath, (err, files) => {
-              console.log(files);
-              files.shift();
-              win.webContents.send('allFiles',files);
-            })
-          }
+          click: () => {dispDialog(win)}
         }
       ]
     },
@@ -156,6 +135,8 @@ const createWindow = () => {
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
 
+  win.loadFile('index.html');
+
 
 }
 
@@ -186,3 +167,18 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
+
+const dispDialog = async(win) => {
+  const filename = await dialog.showOpenDialog({
+    properties: ['openDirectory'],
+    title: 'ファイルを選択しよう'
+  });
+  const filepath = filename.filePaths[0];
+  console.log(filepath);
+  win.webContents.send('filename',filepath);
+  fs.readdir(filepath, (err, files) => {
+    console.log(files);
+    files.shift();
+    win.webContents.send('allFiles',files);
+  })
+}
