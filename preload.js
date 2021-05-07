@@ -15,5 +15,9 @@ contextBridge.exposeInMainWorld('api', {
     openFile() {
       ipcRenderer.send('fileDialog');
     },
+
+    openFileTwo() {
+      ipcRenderer.send('fileDialogTwo');
+    }
   },
 });

@@ -59,6 +59,15 @@ ipcMain.on("fileDialog", (event) => {
   dispDialog(event);
 });
 
+ipcMain.on("fileDialogTwo", async(event) => {
+  const filename = await dialog.showOpenDialog({
+    properties: ["openDirectory"],
+    title: "title"
+  });
+  const filepath = filename.filePaths[0];
+  event.reply("filenameTwo", filepath);
+})
+
 //ダイアログを表示して、選択したフォルダのパスと中身のファイル全てをレンダラーに返して表示する関数
 const dispDialog = async (event) => {
   const filename = await dialog.showOpenDialog({

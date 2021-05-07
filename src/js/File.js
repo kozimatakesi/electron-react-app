@@ -14,12 +14,6 @@ const File = () => {
     });
   }, []);
 
-  //channel:filenameにsendがあったとき、題名をファイルパスに書き換え
-  api.on(
-    "filename",
-    (event, arg) => (document.querySelector("#hoge").textContent = arg)
-  );
-
   return <h2>Hi</h2>;
 };
 
