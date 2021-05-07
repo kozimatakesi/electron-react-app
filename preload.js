@@ -4,7 +4,7 @@ contextBridge.exposeInMainWorld('api', {
   notificationApi: {
     sendNotification(message) {
       ipcRenderer.send('notify', message);
-    }
+    },
   },
 
   on: (channel, callback) => {
@@ -12,8 +12,8 @@ contextBridge.exposeInMainWorld('api', {
   },
 
   filesApi: {
-    openFile(){
+    openFile() {
       ipcRenderer.send('fileDialog');
-    }
-  }
-})
+    },
+  },
+});
