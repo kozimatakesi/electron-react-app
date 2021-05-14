@@ -54,11 +54,8 @@ app.on("window-all-closed", () => {
   }
 });
 
-//ファイル検索ボタンが押されたら
-ipcMain.on("fileDialog", (event) => {
-  dispDialog(event);
-});
 
+//送信先フォルダを指定するためのダイアログを開く
 ipcMain.on("fileDialogTwo", async(event) => {
   const filename = await dialog.showOpenDialog({
     properties: ["openDirectory"],
@@ -67,6 +64,11 @@ ipcMain.on("fileDialogTwo", async(event) => {
   const filepath = filename.filePaths[0];
   event.reply("filenameTwo", filepath);
 })
+
+//ファイル検索ボタンが押されたら
+ipcMain.on("fileDialog", (event) => {
+  dispDialog(event);
+});
 
 //ダイアログを表示して、選択したフォルダのパスと中身のファイル全てをレンダラーに返して表示する関数
 const dispDialog = async (event) => {

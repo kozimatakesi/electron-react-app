@@ -63,7 +63,12 @@ const Button = () => {
       </div>
 
       <ul id="list"></ul>
-      <button>コピー実行</button>
+      <button
+        onClick={() => {
+          api.filesApi.copyFile(fileArray);
+        }}
+        >コピー実行
+      </button>
     </div>
   );
 };
