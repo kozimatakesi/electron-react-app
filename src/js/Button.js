@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 
 const Button = () => {
   const [mkdirPath, setMkdirPath] = useState("コピー先ファイルパス");
-  const [originaldirPath, setOriginaldirPath] =
-    useState("コピー元ファイルパス");
-  const [fileList, setFileList] = useState([""]);
+  const [originaldirPath, setOriginaldirPath] = useState("コピー元ファイルパス");
+  const [fileList, setFileList] = useState([]);
+  const [fileInfo, setFileInfo] = useState([]);
 
   const handleInputChangedMkdir = (event) => {
     const inputValue = event.target.value;
@@ -15,6 +15,12 @@ const Button = () => {
     const inputValue = event.target.value;
     setOriginaldirPath(inputValue);
   };
+
+  let listItems = "";
+  if(fileInfo.length === fileList.length) {
+    listItems = fileInfo.map((file, idx) => <li key={idx}>{file.size}byte</li> )
+  }
+
 
   useEffect(() => {
     //コピー元ファイルパスをダイアログで選択したものに変更する
@@ -31,6 +37,11 @@ const Button = () => {
     api.on("allFiles", (_, allFiles) => {
       setFileList(allFiles);
     });
+
+    api.on("allFilesInfo", (_, stats) => {
+      setFileInfo(stats);
+    })
+
   }, []);
 
   return (
@@ -67,11 +78,22 @@ const Button = () => {
           }}
         />
       </div>
-      <ul id="list">
-        {fileList.map((file) => (
-          <li key={file}>{file}</li>
-        ))}
-      </ul>
+
+      <div>
+        <div className="left">
+          <ul id="list">
+            {fileList.map((file) => (
+              <li key={file}>{file}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="left">
+          <ul id="list">
+            {listItems}
+          </ul>
+        </div>
+      </div>
 
       <button
         onClick={() => {

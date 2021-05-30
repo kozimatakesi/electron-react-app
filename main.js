@@ -56,11 +56,13 @@ app.on("window-all-closed", () => {
 
 //ファイルをコピーする
 ipcMain.on("filecopy", (_, pathInfo) => {
-  pathInfo.files.forEach(file => {
+
+  //勝手にファイルをコピーしたら危険なのでコメントアウト
+  /* pathInfo.files.forEach(file => {
     fs.copyFile(`${pathInfo.original}/${file}`, `${pathInfo.mkdir}/${file}`,(err) => {
       if(err) throw err;
     })
-  });
+  }); */
 
   new Notification({
     title: `コピー完了`,
@@ -91,10 +93,25 @@ const dispDialog = async (event) => {
   });
   const filepath = filename.filePaths[0];
   event.reply("filename", filepath);
+
+  const filesArray = [];
   fs.readdir(filepath, (err, files) => {
-    //files.shift();
+    files.map(async (file) => {
+      console.log(file);
+      await fs.stat(`${filepath}/${file}`, (err, stats) => {
+        filesArray.push(stats);
+        event.reply("allFilesInfo", filesArray);
+      })
+    })
+
     event.reply("allFiles", files);
   });
+
+  fs.stat(filepath,(err, files) => {
+    event.reply("allFilesInfo", files);
+  })
+
+
 };
 
 //Menuバーの作成
