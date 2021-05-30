@@ -1,39 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const Button = () => {
-  const [mkdirPath, setMkdirPath] = useState('コピー先ファイルパス');
-  const [originaldirPath, setOriginaldirPath] = useState('コピー元ファイルパス');
+  const [mkdirPath, setMkdirPath] = useState("コピー先ファイルパス");
+  const [originaldirPath, setOriginaldirPath] =
+    useState("コピー元ファイルパス");
+  const [fileList, setFileList] = useState([""]);
 
   const handleInputChangedMkdir = (event) => {
     const inputValue = event.target.value;
     setMkdirPath(inputValue);
-  }
+  };
 
   const handleInputChangedOriginal = (event) => {
     const inputValue = event.target.value;
     setOriginaldirPath(inputValue);
-  }
+  };
 
-  api.on(
-    "filename",
-    (event, arg) => (setOriginaldirPath(arg))
-  );
+  useEffect(() => {
+    //コピー元ファイルパスをダイアログで選択したものに変更する
+    api.on("filename", (_, arg) => {
+      setOriginaldirPath(arg);
+    });
 
-  api.on(
-    "filenameTwo",
-    (event, arg) => (setMkdirPath(arg))
-  );
+    //コピー先ファイルパスをダイアログで選択したものに変更する
+    api.on("copyFolderPath", (_, arg) => {
+      setMkdirPath(arg);
+    });
+
+    //channel:allFilesにsendがあったとき、指定ファイルパス内のファイルをリストで表示
+    api.on("allFiles", (_, allFiles) => {
+      setFileList(allFiles);
+    });
+  }, []);
 
   return (
     <div>
-      <h1 id="hoge">I am App Component!!!!</h1>
-      <button
-        onClick={() => {
-          api.notificationApi.sendNotification("My custom notification!");
-        }}
-      >
-        Notify
-      </button>
+      <h1 id="hoge">ファイルコピー君</h1>
       <div>
         <button
           onClick={() => {
@@ -44,12 +46,14 @@ const Button = () => {
         </button>
         <input
           value={originaldirPath}
-          onChange={(event) => handleInputChangedOriginal(event)}
+          onChange={(event) => {
+            handleInputChangedOriginal(event);
+          }}
         />
       </div>
 
       <div>
-      <button
+        <button
           onClick={() => {
             api.filesApi.openFileTwo();
           }}
@@ -58,16 +62,26 @@ const Button = () => {
         </button>
         <input
           value={mkdirPath}
-          onChange={(event) => handleInputChangedMkdir(event)}
+          onChange={(event) => {
+            handleInputChangedMkdir(event);
+          }}
         />
       </div>
+      <ul id="list">
+        {fileList.map((file) => (
+          <li key={file}>{file}</li>
+        ))}
+      </ul>
 
-      <ul id="list"></ul>
       <button
         onClick={() => {
-          api.filesApi.copyFile(fileArray);
+          api.filesApi.copyFile({
+            mkdir: mkdirPath,
+            original: originaldirPath,
+          });
         }}
-        >コピー実行
+      >
+        コピー実行
       </button>
     </div>
   );

@@ -54,6 +54,13 @@ app.on("window-all-closed", () => {
   }
 });
 
+//ファイルをコピーする
+ipcMain.on("filecopy", (_, pathInfo) => {
+  /* fs.copyFile('/Users/kawamoto/Desktop/前フォルダ/test.txt','/Users/kawamoto/Desktop/後フォルダ/test.txt',(err) => {
+    if(err) throw err;
+  }) */
+  new Notification({ title: `${pathInfo.mkdir}`, body: `${pathInfo.original}をコピーしました` }).show();
+})
 
 //送信先フォルダを指定するためのダイアログを開く
 ipcMain.on("fileDialogTwo", async(event) => {
@@ -62,7 +69,7 @@ ipcMain.on("fileDialogTwo", async(event) => {
     title: "title"
   });
   const filepath = filename.filePaths[0];
-  event.reply("filenameTwo", filepath);
+  event.reply("copyFolderPath", filepath);
 })
 
 //ファイル検索ボタンが押されたら
@@ -79,7 +86,7 @@ const dispDialog = async (event) => {
   const filepath = filename.filePaths[0];
   event.reply("filename", filepath);
   fs.readdir(filepath, (err, files) => {
-    files.shift();
+    //files.shift();
     event.reply("allFiles", files);
   });
 };

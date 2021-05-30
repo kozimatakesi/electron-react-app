@@ -20,8 +20,8 @@ contextBridge.exposeInMainWorld('api', {
       ipcRenderer.send('fileDialogTwo');
     },
 
-    copyFile(arg) {
-      ipcRenderer.send('filecopy', arg)
+    copyFile(pathInfo) {
+      ipcRenderer.send('filecopy', pathInfo)
     }
   },
 });
