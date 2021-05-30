@@ -78,6 +78,7 @@ const Button = () => {
           api.filesApi.copyFile({
             mkdir: mkdirPath,
             original: originaldirPath,
+            files: fileList
           });
         }}
       >

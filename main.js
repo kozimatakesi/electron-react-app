@@ -56,21 +56,27 @@ app.on("window-all-closed", () => {
 
 //ファイルをコピーする
 ipcMain.on("filecopy", (_, pathInfo) => {
-  /* fs.copyFile('/Users/kawamoto/Desktop/前フォルダ/test.txt','/Users/kawamoto/Desktop/後フォルダ/test.txt',(err) => {
-    if(err) throw err;
-  }) */
-  new Notification({ title: `${pathInfo.mkdir}`, body: `${pathInfo.original}をコピーしました` }).show();
-})
+  pathInfo.files.forEach(file => {
+    fs.copyFile(`${pathInfo.original}/${file}`, `${pathInfo.mkdir}/${file}`,(err) => {
+      if(err) throw err;
+    })
+  });
+
+  new Notification({
+    title: `コピー完了`,
+    body: `${pathInfo.mkdir}に${pathInfo.files}をコピーしました`,
+  }).show();
+});
 
 //送信先フォルダを指定するためのダイアログを開く
-ipcMain.on("fileDialogTwo", async(event) => {
+ipcMain.on("fileDialogTwo", async (event) => {
   const filename = await dialog.showOpenDialog({
     properties: ["openDirectory"],
-    title: "title"
+    title: "title",
   });
   const filepath = filename.filePaths[0];
   event.reply("copyFolderPath", filepath);
-})
+});
 
 //ファイル検索ボタンが押されたら
 ipcMain.on("fileDialog", (event) => {
