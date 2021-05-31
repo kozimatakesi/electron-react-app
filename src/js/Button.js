@@ -16,6 +16,7 @@ const Button = () => {
     setOriginaldirPath(inputValue);
   };
 
+  //fileInfoの要素数がfileListの要素数と等しくなったらlistItemsを表示する
   let listItems = "";
   if(fileInfo.length === fileList.length) {
     listItems = fileInfo.map((file, idx) => <li key={idx}>{file.size}byte</li> )

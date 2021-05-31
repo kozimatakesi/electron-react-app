@@ -91,27 +91,25 @@ const dispDialog = async (event) => {
     properties: ["openDirectory"],
     title: "ファイルを選択しよう",
   });
+
   const filepath = filename.filePaths[0];
   event.reply("filename", filepath);
-
   const filesArray = [];
+  //filepathのファイル一覧を取得
   fs.readdir(filepath, (err, files) => {
-    files.map(async (file) => {
-      console.log(file);
-      await fs.stat(`${filepath}/${file}`, (err, stats) => {
+    files.map((file) => {
+      //file毎のstatsを取得
+      fs.stat(`${filepath}/${file}`, (err, stats) => {
         filesArray.push(stats);
         event.reply("allFilesInfo", filesArray);
       })
     })
-
     event.reply("allFiles", files);
   });
 
   fs.stat(filepath,(err, files) => {
     event.reply("allFilesInfo", files);
   })
-
-
 };
 
 //Menuバーの作成
