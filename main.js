@@ -97,19 +97,15 @@ const dispDialog = async (event) => {
   const filesArray = [];
   //filepathのファイル一覧を取得
   fs.readdir(filepath, (err, files) => {
-    files.map((file) => {
+    event.reply("allFiles", files);
+    files.forEach((file) => {
       //file毎のstatsを取得
       fs.stat(`${filepath}/${file}`, (err, stats) => {
-        filesArray.push(stats);
+        filesArray.push({file, stats});
         event.reply("allFilesInfo", filesArray);
       })
     })
-    event.reply("allFiles", files);
   });
-
-  fs.stat(filepath,(err, files) => {
-    event.reply("allFilesInfo", files);
-  })
 };
 
 //Menuバーの作成

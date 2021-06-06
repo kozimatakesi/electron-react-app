@@ -19,7 +19,13 @@ const Button = () => {
   //fileInfoの要素数がfileListの要素数と等しくなったらlistItemsを表示する
   let listItems = "";
   if(fileInfo.length === fileList.length) {
-    listItems = fileInfo.map((file, idx) => <li key={idx}>{file.size}byte</li> )
+    listItems = fileInfo.map((file, idx) =>
+      <tr key={idx}>
+        <td>{file.file}</td>
+        <td>{file.stats.size}byte</td>
+        <td>{file.stats.mtime.toString()}</td>
+      </tr>
+    )
   }
 
 
@@ -41,6 +47,7 @@ const Button = () => {
 
     api.on("allFilesInfo", (_, stats) => {
       setFileInfo(stats);
+      console.log(stats);
     })
 
   }, []);
@@ -80,21 +87,22 @@ const Button = () => {
         />
       </div>
 
-      <div>
-        <div className="left">
-          <ul id="list">
-            {fileList.map((file) => (
-              <li key={file}>{file}</li>
-            ))}
-          </ul>
-        </div>
+      <table border="1">
+        <tr>
+          <th>
+            ファイル名
+          </th>
+          <th>
+            ファイルサイズ
+          </th>
+          <th>
+            更新日時
+          </th>
+        </tr>
+        {listItems}
 
-        <div className="left">
-          <ul id="list">
-            {listItems}
-          </ul>
-        </div>
-      </div>
+      </table>
+
 
       <button
         onClick={() => {
