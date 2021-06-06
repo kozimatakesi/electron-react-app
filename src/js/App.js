@@ -1,6 +1,6 @@
 import React from "react";
 import SearchDir from "./SearchDir";
-import File from "./File";
+import FilesList from "./FilesList";
 
 export default function App() {
   return (
