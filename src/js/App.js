@@ -1,11 +1,11 @@
 import React from "react";
-import Button from "./Button";
+import SearchDir from "./SearchDir";
 import File from "./File";
 
 export default function App() {
   return (
     <>
-      <Button />
+      <SearchDir />
     </>
   );
 }

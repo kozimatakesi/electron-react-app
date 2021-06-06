@@ -1,6 +1,7 @@
+/* eslint-disable no-undef */
 import React, { useState, useEffect } from "react";
 
-const Button = () => {
+const SearchDir = () => {
   const [copyToPath, setCopyToPath] = useState("コピー先ファイルパス");
   const [originalDirPath, setOriginalDirPath] =
     useState("コピー元ファイルパス");
@@ -103,4 +104,4 @@ const Button = () => {
   );
 };
 
-export default Button;
+export default SearchDir;
