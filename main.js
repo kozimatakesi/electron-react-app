@@ -7,7 +7,7 @@ const {
   Menu,
 } = require("electron");
 const path = require("path");
-const fs = require("fs");
+const fs = require("fs").promises;
 
 const isDev = !app.isPackaged;
 
@@ -82,31 +82,31 @@ ipcMain.on("fileDialogTwo", async (event) => {
 
 //ファイル検索ボタンが押されたら
 ipcMain.on("fileDialog", (event) => {
+  console.log('呼ばれとる');
   dispDialog(event);
 });
 
 //ダイアログを表示して、選択したフォルダのパスと中身のファイル全てをレンダラーに返して表示する関数
 const dispDialog = async (event) => {
-  const filename = await dialog.showOpenDialog({
-    properties: ["openDirectory"],
-    title: "ファイルを選択しよう",
-  });
-
-  const filepath = filename.filePaths[0];
-  event.reply("filename", filepath);
-  const filesArray = [];
-  //filepathのファイル一覧を取得
-  fs.readdir(filepath, (err, files) => {
-    event.reply("allFiles", files);
-    files.forEach((file) => {
-      //file毎のstatsを取得
-      fs.stat(`${filepath}/${file}`, (err, stats) => {
-        filesArray.push({file, stats});
-        event.reply("allFilesInfo", filesArray);
-      })
-    })
-  });
-};
+  try {
+    const filename = await dialog.showOpenDialog({
+      properties: ["openDirectory"],
+      title: "ファイルを選択しよう",
+    });
+    const filepath = filename.filePaths[0];
+    event.reply("filename", filepath);
+    const filesArray = [];
+    const content = await fs.readdir(filepath, 'utf-8');
+    event.reply('allFiles', content);
+    for(let i = 0; i < content.length; i++){
+      const stats = await fs.stat(`${filepath}/${content[i]}`, 'utf-8');
+      filesArray.push({file:content[i], stats:stats});
+      event.reply('allFilesInfo', filesArray);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 //Menuバーの作成
 const isMac = process.platform === "darwin";
