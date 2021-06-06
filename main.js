@@ -13,7 +13,7 @@ const isDev = !app.isPackaged;
 
 const createWindow = () => {
   const win = new BrowserWindow({
-    width: 600,
+    width: 900,
     height: 400,
     backgroundColor: "white",
     webPreferences: {
@@ -59,7 +59,7 @@ ipcMain.on("filecopy", (_, pathInfo) => {
 
   //勝手にファイルをコピーしたら危険なのでコメントアウト
   /* pathInfo.files.forEach(file => {
-    fs.copyFile(`${pathInfo.original}/${file}`, `${pathInfo.mkdir}/${file}`,(err) => {
+    fs.copyFile(`${pathInfo.original}/${file}`, `${pathInfo.copyTo}/${file}`,(err) => {
       if(err) throw err;
     })
   }); */
@@ -71,38 +71,36 @@ ipcMain.on("filecopy", (_, pathInfo) => {
 });
 
 //送信先フォルダを指定するためのダイアログを開く
-ipcMain.on("fileDialogTwo", async (event) => {
-  const filename = await dialog.showOpenDialog({
+ipcMain.on("searchCopyToDir", async (event) => {
+  const dirInfo = await dialog.showOpenDialog({
     properties: ["openDirectory"],
     title: "title",
   });
-  const filepath = filename.filePaths[0];
-  event.reply("copyFolderPath", filepath);
+  const dirPath = dirInfo.filePaths[0];
+  event.reply("copyToDirPath", dirPath);
 });
 
 //ファイル検索ボタンが押されたら
-ipcMain.on("fileDialog", (event) => {
-  console.log('呼ばれとる');
+ipcMain.on("searchOriginalDir", (event) => {
   dispDialog(event);
 });
 
-//ダイアログを表示して、選択したフォルダのパスと中身のファイル全てをレンダラーに返して表示する関数
+//ダイアログを表示して、選択したフォルダのパスと中身のファイル全てのファイル名、ファイルサイズ、更新日時をレンダラーに返して表示する関数
 const dispDialog = async (event) => {
   try {
-    const filename = await dialog.showOpenDialog({
+    const dirInfo = await dialog.showOpenDialog({
       properties: ["openDirectory"],
-      title: "ファイルを選択しよう",
+      title: "ディレクトリを選択しよう",
     });
-    const filepath = filename.filePaths[0];
-    event.reply("filename", filepath);
-    const filesArray = [];
-    const content = await fs.readdir(filepath, 'utf-8');
-    event.reply('allFiles', content);
-    for(let i = 0; i < content.length; i++){
-      const stats = await fs.stat(`${filepath}/${content[i]}`, 'utf-8');
-      filesArray.push({file:content[i], stats:stats});
-      event.reply('allFilesInfo', filesArray);
+    const dirPath = dirInfo.filePaths[0];
+    event.reply("originalDirPath", dirPath);
+    const filesInfoArray = [];
+    const allFilesName = await fs.readdir(dirPath, 'utf-8');
+    for(let i = 0; i < allFilesName.length; i++){
+      const stats = await fs.stat(`${dirPath}/${allFilesName[i]}`, 'utf-8');
+      filesInfoArray.push({name:allFilesName[i], stats:stats});
     }
+    event.reply('allFilesInfo', filesInfoArray);
   } catch (err) {
     console.log(err);
   }

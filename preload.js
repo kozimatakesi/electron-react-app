@@ -12,12 +12,12 @@ contextBridge.exposeInMainWorld('api', {
   },
 
   filesApi: {
-    openFile() {
-      ipcRenderer.send('fileDialog');
+    searchOriginalDir() {
+      ipcRenderer.send('searchOriginalDir');
     },
 
-    openFileTwo() {
-      ipcRenderer.send('fileDialogTwo');
+    searchCopyToDir() {
+      ipcRenderer.send('searchCopyToDir');
     },
 
     copyFile(pathInfo) {

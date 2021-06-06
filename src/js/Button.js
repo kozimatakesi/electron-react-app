@@ -1,27 +1,26 @@
 import React, { useState, useEffect } from "react";
 
 const Button = () => {
-  const [mkdirPath, setMkdirPath] = useState("コピー先ファイルパス");
-  const [originaldirPath, setOriginaldirPath] = useState("コピー元ファイルパス");
-  const [fileList, setFileList] = useState([]);
-  const [fileInfo, setFileInfo] = useState([]);
+  const [copyToPath, setCopyToPath] = useState("コピー先ファイルパス");
+  const [originalDirPath, setOriginalDirPath] = useState("コピー元ファイルパス");
+  const [filesInfo, setFilesInfo] = useState([]);
 
-  const handleInputChangedMkdir = (event) => {
+  const handleInputChangedCopyTo = (event) => {
     const inputValue = event.target.value;
-    setMkdirPath(inputValue);
+    setCopyToPath(inputValue);
   };
 
   const handleInputChangedOriginal = (event) => {
     const inputValue = event.target.value;
-    setOriginaldirPath(inputValue);
+    setoriginalDirPath(inputValue);
   };
 
-  //fileInfoの要素数がfileListの要素数と等しくなったらlistItemsを表示する
+  //filesInfoが更新されたらlistItemsを表示する
   let listItems = "";
-  if(fileInfo.length === fileList.length) {
-    listItems = fileInfo.map((file, idx) =>
+  if(filesInfo) {
+    listItems = filesInfo.map((file, idx) =>
       <tr key={idx}>
-        <td>{file.file}</td>
+        <td>{file.name}</td>
         <td>{file.stats.size}byte</td>
         <td>{file.stats.mtime.toString()}</td>
       </tr>
@@ -30,24 +29,18 @@ const Button = () => {
 
 
   useEffect(() => {
-    //コピー元ファイルパスをダイアログで選択したものに変更する
-    api.on("filename", (_, arg) => {
-      setOriginaldirPath(arg);
+    //コピー元ディレクトリパスをダイアログで選択したものに変更する
+    api.on("originalDirPath", (_, arg) => {
+      setOriginalDirPath(arg);
     });
 
-    //コピー先ファイルパスをダイアログで選択したものに変更する
-    api.on("copyFolderPath", (_, arg) => {
-      setMkdirPath(arg);
+    //コピー先ディレクトリパスをダイアログで選択したものに変更する
+    api.on("copyToDirPath", (_, arg) => {
+      setCopyToPath(arg);
     });
-
-    //channel:allFilesにsendがあったとき、指定ファイルパス内のファイルをリストで表示
-    api.on("allFiles", (_, allFiles) => {
-      setFileList(allFiles);
-    });
-
-    api.on("allFilesInfo", (_, stats) => {
-      setFileInfo(stats);
-      console.log(stats);
+    //コピー元ディレクトリパス内の全ファイルのファイル名、スタッツを取得
+    api.on("allFilesInfo", (_, arg) => {
+      setFilesInfo(arg);
     })
 
   }, []);
@@ -58,13 +51,13 @@ const Button = () => {
       <div>
         <button
           onClick={() => {
-            api.filesApi.openFile();
+            api.filesApi.searchOriginalDir();
           }}
         >
           コピー元フォルダ検索
         </button>
         <input
-          value={originaldirPath}
+          value={originalDirPath}
           onChange={(event) => {
             handleInputChangedOriginal(event);
           }}
@@ -74,15 +67,15 @@ const Button = () => {
       <div>
         <button
           onClick={() => {
-            api.filesApi.openFileTwo();
+            api.filesApi.searchCopyToDir();
           }}
         >
           コピー先フォルダ検索
         </button>
         <input
-          value={mkdirPath}
+          value={copyToPath}
           onChange={(event) => {
-            handleInputChangedMkdir(event);
+            handleInputChangedCopyTo(event);
           }}
         />
       </div>
@@ -107,8 +100,8 @@ const Button = () => {
       <button
         onClick={() => {
           api.filesApi.copyFile({
-            mkdir: mkdirPath,
-            original: originaldirPath,
+            copyTo: copyToPath,
+            original: originalDirPath,
             files: fileList
           });
         }}
