@@ -1,6 +1,20 @@
 /* eslint-disable no-undef */
 import React, { useState, useEffect } from "react";
 
+const DirectorySerchForm = ({ label, path, onSearch, onChangePath }) => (
+  <div>
+    <button
+      onClick={onSearch}
+    >
+      {label}
+    </button>
+    <input
+      value={path}
+      onChange={onChangePath}
+    />
+  </div>
+);
+
 const SearchDir = () => {
   const [copyToPath, setCopyToPath] = useState("コピー先ファイルパス");
   const [originalDirPath, setOriginalDirPath] =
@@ -16,19 +30,6 @@ const SearchDir = () => {
     const inputValue = event.target.value;
     setOriginalDirPath(inputValue);
   };
-
-  //filesInfoが更新されたらlistItemsを表示する
-  let listItems = "";
-  if (filesInfo) {
-    listItems = filesInfo.map((file, idx) => (
-      <tr key={idx}>
-        <td>{file.name}</td>
-        <td>{file.stats.size}byte</td>
-        <td>{file.stats.mtime.toString()}</td>
-      </tr>
-    ));
-  }
-
   useEffect(() => {
     //コピー元ディレクトリパスをダイアログで選択したものに変更する
     api.on("originalDirPath", (_, arg) => {
@@ -48,36 +49,26 @@ const SearchDir = () => {
   return (
     <div>
       <div>
-        <button
-          onClick={() => {
+        <DirectorySerchForm
+          label="コピー元フォルダ検索"
+          path={originalDirPath}
+          onSearch={() => {
             api.filesApi.searchOriginalDir();
           }}
-        >
-          コピー元フォルダ検索
-        </button>
-        <input
-          value={originalDirPath}
-          onChange={(event) => {
+          onChangePath={(event) => {
             handleInputChangedOriginal(event);
           }}
         />
-      </div>
-
-      <div>
-        <button
-          onClick={() => {
+        <DirectorySerchForm
+          label="コピー先フォルダ検索"
+          path={copyToPath}
+          onSearch={() => {
             api.filesApi.searchCopyToDir();
           }}
-        >
-          コピー先フォルダ検索
-        </button>
-        <input
-          value={copyToPath}
-          onChange={(event) => {
+          onChangePath={(event) => {
             handleInputChangedCopyTo(event);
           }}
         />
-      </div>
 
       <table border="1">
         <tr>
@@ -85,7 +76,13 @@ const SearchDir = () => {
           <th>ファイルサイズ</th>
           <th>更新日時</th>
         </tr>
-        {listItems}
+        {filesInfo && filesInfo.map((file, idx) => (
+          <tr key={idx}>
+            <td>{file.name}</td>
+            <td>{file.stats.size}byte</td>
+            <td>{file.stats.mtime.toString()}</td>
+          </tr>
+         ))}
       </table>
 
       <button
