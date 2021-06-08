@@ -47,7 +47,6 @@ const SearchDir = () => {
 
   return (
     <div>
-      <h1 id="hoge">ファイルコピー君</h1>
       <div>
         <button
           onClick={() => {
