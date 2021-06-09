@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 import React, { useState, useEffect } from "react";
 import DirSerchForm from "./DirSerchForm";
+import FilesList from "./FilesList";
 
 const SearchDir = () => {
   const [copyToPath, setCopyToPath] = useState("コピー先ファイルパス");
@@ -46,6 +47,7 @@ const SearchDir = () => {
           handleInputChangedOriginal(event);
         }}
       />
+
       <DirSerchForm
         label="コピー先フォルダ"
         path={copyToPath}
@@ -57,21 +59,7 @@ const SearchDir = () => {
         }}
       />
 
-      <table border="1">
-        <tr>
-          <th>ファイル名</th>
-          <th>ファイルサイズ</th>
-          <th>更新日時</th>
-        </tr>
-        {filesInfo &&
-          filesInfo.map((file, idx) => (
-            <tr key={idx}>
-              <td>{file.name}</td>
-              <td>{file.stats.size}byte</td>
-              <td>{file.stats.mtime.toString()}</td>
-            </tr>
-          ))}
-      </table>
+      <FilesList filesInfo={filesInfo} />
 
       <button
         onClick={() => {
