@@ -7,6 +7,9 @@ const {
   Menu,
 } = require("electron");
 const path = require("path");
+const xlsx = require("xlsx");
+const xutil = xlsx.utils;
+
 const fs = require("fs").promises;
 const isDev = !app.isPackaged;
 const createWindow = () => {
@@ -51,6 +54,36 @@ app.on("window-all-closed", () => {
     app.quit();
   }
 });
+//xlsxを読み込んでとりあえずアラート表示する
+ipcMain.on("xlsxLoad", async (_, pathInfo) => {
+  let wb = await xlsx.readFile(pathInfo);
+  let ws = await wb.Sheets[wb.SheetNames[0]];
+  let data = await ws["A1"];
+  console.log(data);
+  new Notification({ title: pathInfo, body: data.v }).show();
+});
+
+//リストをxlsxにしたものを作成する
+ipcMain.on("xlsxOutput", async (_, pathInfo) => {
+  let d = [["ファイル名", "ファイルサイズ", "更新日"]];
+
+  for (let i = 0; i < pathInfo.files.length; i++) {
+    let newArray = [
+      pathInfo.files[i].name,
+      pathInfo.files[i].stats.size,
+      pathInfo.files[i].stats.mtime.toString(),
+    ];
+    d.push(newArray);
+  }
+
+  let wb = xutil.book_new();
+  let ws = xutil.aoa_to_sheet(d);
+  let ws_name = "出力シート";
+
+  xutil.book_append_sheet(wb, ws, ws_name);
+  xlsx.writeFile(wb, "Output.xlsx");
+  console.log("xlsxファイルを生成しました");
+});
 
 //ファイルをコピーする
 ipcMain.on("filecopy", (_, pathInfo) => {
@@ -65,6 +98,22 @@ ipcMain.on("filecopy", (_, pathInfo) => {
     title: `コピー完了`,
     body: `${pathInfo.copyTo}に${pathInfo.files[0].name}他をコピーしました`,
   }).show();
+});
+
+//対象エクセルファイルパスを指定するためのダイアログを開く
+ipcMain.on("searchXlsxFile", async (event) => {
+  const xlsxFileInfo = await dialog.showOpenDialog({
+    title: "xlsx search",
+    filters: [
+      {
+        name: "xlsx",
+        extensions: ["xls", "xlsx", "xlsm", "ods", "csv"],
+      },
+    ],
+    properties: ["openFile"],
+  });
+  const xlsxFilePath = xlsxFileInfo.filePaths[0];
+  event.reply("xlsxFilePath", xlsxFilePath);
 });
 
 //送信先フォルダを指定するためのダイアログを開く

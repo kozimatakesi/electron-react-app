@@ -7,6 +7,7 @@ const SearchDir = () => {
   const [copyToPath, setCopyToPath] = useState("コピー先ファイルパス");
   const [originalDirPath, setOriginalDirPath] =
     useState("コピー元ファイルパス");
+  const [xlsxFilePath, setXlsxFilePath] = useState("エクセルファイルパス");
   const [filesInfo, setFilesInfo] = useState([]);
 
   const handleInputChangedCopyTo = (event) => {
@@ -17,6 +18,11 @@ const SearchDir = () => {
   const handleInputChangedOriginal = (event) => {
     const inputValue = event.target.value;
     setOriginalDirPath(inputValue);
+  };
+
+  const handleInputChangedXlsx = (event) => {
+    const inputValue = event.target.value;
+    setXlsxFilePath(inputValue);
   };
 
   useEffect(() => {
@@ -32,6 +38,10 @@ const SearchDir = () => {
     //コピー元ディレクトリパス内の全ファイルのファイル名、スタッツを取得
     api.on("allFilesInfo", (_, arg) => {
       setFilesInfo(arg);
+    });
+    //エクセルファイルパスをダイアログで選択したものに変更する
+    api.on("xlsxFilePath", (_, arg) => {
+      setXlsxFilePath(arg);
     });
   }, []);
 
@@ -59,11 +69,22 @@ const SearchDir = () => {
         }}
       />
 
+      <DirSerchForm
+        label="エクセルファイル"
+        path={xlsxFilePath}
+        onSearch={() => {
+          api.filesApi.searchXlsxFile();
+        }}
+        onChangePath={(event) => {
+          handleInputChangedXlsx(event);
+        }}
+      />
+
       <FilesList filesInfo={filesInfo} />
 
       <button
         onClick={() => {
-          api.filesApi.copyFile({
+          api.filesApi.xlsxOutput({
             copyTo: copyToPath,
             original: originalDirPath,
             files: filesInfo,
@@ -71,6 +92,14 @@ const SearchDir = () => {
         }}
       >
         コピー実行
+      </button>
+
+      <button
+        onClick={() => {
+          api.filesApi.xlsxLoad(xlsxFilePath);
+        }}
+      >
+        エクセル読み込み
       </button>
     </div>
   );

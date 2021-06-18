@@ -20,8 +20,20 @@ contextBridge.exposeInMainWorld("api", {
       ipcRenderer.send("searchCopyToDir");
     },
 
+    searchXlsxFile() {
+      ipcRenderer.send("searchXlsxFile");
+    },
+
     copyFile(pathInfo) {
       ipcRenderer.send("filecopy", pathInfo);
+    },
+
+    xlsxOutput(pathInfo) {
+      ipcRenderer.send("xlsxOutput", pathInfo);
+    },
+
+    xlsxLoad(pathInfo) {
+      ipcRenderer.send("xlsxLoad", pathInfo);
     },
   },
 });
